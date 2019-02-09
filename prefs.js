@@ -51,7 +51,7 @@ var BitcoindMonitorPrefsWidget = new GObject.Class({
         let entry = Gtk.SpinButton.new_with_range (from, to, 1);
         this.attach(entry, x+1, y, 1, 1);
 
-        this._settings.bind(key, entry, 'text', Gio.SettingsBindFlags.DEFAULT);
+        this._settings.bind(key, entry, 'value', Gio.SettingsBindFlags.DEFAULT);
     }
 });
 
