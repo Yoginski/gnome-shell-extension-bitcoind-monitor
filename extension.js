@@ -30,6 +30,8 @@ var BitcoinMonitorButton = new Lang.Class({
         this._settings = Convenience.getSettings();
         this._rpcUser = this._settings.get_string('rpcuser');
         this._rpcPassword = this._settings.get_string('rpcpassword');
+        this._rpcHost = this._settings.get_string('rpchost');
+        this._rpcPort = this._settings.get_int('rpcport');
 
         let box = new St.BoxLayout();
 
@@ -55,7 +57,7 @@ var BitcoinMonitorButton = new Lang.Class({
     },
 
     _queryBitcoind: function(callback) {
-        let message = Soup.Message.new('POST', 'http://' + this._rpcUser + ':' + this._rpcPassword + '@127.0.0.1:8332');
+        let message = Soup.Message.new('POST', 'http://' + this._rpcUser + ':' + this._rpcPassword + '@' + this._rpcHost + ':' + this._rpcPort.toString());
         let body = '{ "method": "getblockchaininfo" }';
         message.set_request('application/json', 2, body);
         _httpSession.queue_message(message, function(session, message) {

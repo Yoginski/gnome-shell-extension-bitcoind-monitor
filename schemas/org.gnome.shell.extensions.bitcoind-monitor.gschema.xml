@@ -6,5 +6,11 @@
     <key name="rpcpassword" type="s">
       <default>'password'</default>
     </key>
+    <key name="rpchost" type="s">
+      <default>'127.0.0.1'</default>
+    </key>
+    <key name="rpcport" type="i">
+      <default>8332</default>
+    </key>
   </schema>
 </schemalist>

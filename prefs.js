@@ -23,16 +23,34 @@ var BitcoindMonitorPrefsWidget = new GObject.Class({
 
         this.set_orientation(Gtk.Orientation.HORIZONTAL);
     
-        this._addPasswordEntry('rpcuser', 'Rpc user:');
-        this._addPasswordEntry('rpcpassword', 'Rpc password:');
+        this._addEntry(0, 0, 'rpchost', 'Rpc host:');
+        this._addSpinButton(3, 0, 'rpcport', 'Rpc port:', 1, 65535);
+        this._addEntry(0, 1, 'rpcuser', 'Rpc user:', { visibility: false });
+        this._addEntry(3, 1, 'rpcpassword', 'Rpc password:', { visibility: false });
     },
 
-    _addPasswordEntry: function(key, label) {
-        this.add(new Gtk.Label({ label: '<b>' + label + '</b>',
-                                 use_markup: true,
-                                 halign: Gtk.Align.END }));
-        entry = new Gtk.Entry({ hexpand: true, visibility: false });
-        this.add(entry);
+    _addEntry: function(x, y, key, text, options = {}) {
+        options['hexpand'] = true;
+        let label = new Gtk.Label({ label: '<b>' + text + '</b>',
+                                    use_markup: true,
+                                    halign: Gtk.Align.END })
+        this.attach(label, x, y, 1, 1);
+
+        let entry = new Gtk.Entry(options);
+        this.attach(entry, x+1, y, 1, 1);
+
+        this._settings.bind(key, entry, 'text', Gio.SettingsBindFlags.DEFAULT);
+    },
+
+    _addSpinButton: function(x, y, key, text, from, to) {
+        let label = new Gtk.Label({ label: '<b>' + text + '</b>',
+                                    use_markup: true,
+                                    halign: Gtk.Align.END })
+        this.attach(label, x, y, 1, 1);
+
+        let entry = Gtk.SpinButton.new_with_range (from, to, 1);
+        this.attach(entry, x+1, y, 1, 1);
+
         this._settings.bind(key, entry, 'text', Gio.SettingsBindFlags.DEFAULT);
     }
 });
