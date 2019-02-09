@@ -1,0 +1,16 @@
+
+.helloworld-label {
+    font-size: 36px;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: rgba(10,10,10,0.7);
+    border-radius: 5px;
+    padding: .5em;
+}
+
+.bitcoin-white {
+    background-image: url("icons/bitcoin-white.png");
+    background-size: 16px;
+    height: 16px;
+    width: 16px;
+}

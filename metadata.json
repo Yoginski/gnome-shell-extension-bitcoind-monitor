@@ -1,0 +1,7 @@
+{
+    "name": "bitcoind-monitor",
+    "description": "Shell extension to monitor bitcoind daemon",
+    "uuid": "bitcoind_monitor@laptop",
+    "settings-schema": "org.gnome.shell.extensions.bitcoind-monitor",
+    "shell-version": ["3.30.1"]
+}

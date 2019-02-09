@@ -1,0 +1,10 @@
+<schemalist gettext-domain="gnome-shell-extension-bitcoind-monitor">
+  <schema id="org.gnome.shell.extensions.bitcoind-monitor" path="/org/gnome/shell/extensions/bitcoind-monitor/">
+    <key name="rpcuser" type="s">
+      <default>'user'</default>
+    </key>
+    <key name="rpcpassword" type="s">
+      <default>'password'</default>
+    </key>
+  </schema>
+</schemalist>
