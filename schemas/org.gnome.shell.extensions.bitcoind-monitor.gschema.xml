@@ -12,5 +12,8 @@
     <key name="rpcport" type="i">
       <default>8332</default>
     </key>
+    <key name="refreshinterval" type="i">
+      <default>15</default>
+    </key>
   </schema>
 </schemalist>

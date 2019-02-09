@@ -32,6 +32,7 @@ var BitcoinMonitorButton = new Lang.Class({
         this._rpcPassword = this._settings.get_string('rpcpassword');
         this._rpcHost = this._settings.get_string('rpchost');
         this._rpcPort = this._settings.get_int('rpcport');
+        this._refreshInterval = this._settings.get_int('refreshinterval');
 
         let box = new St.BoxLayout();
 
@@ -51,7 +52,7 @@ var BitcoinMonitorButton = new Lang.Class({
         };
 
         this._queryBitcoind(uiUpdateCallback);
-        Mainloop.timeout_add_seconds(10, Lang.bind(this, function() {
+        Mainloop.timeout_add_seconds(this._refreshInterval, Lang.bind(this, function() {
             this._queryBitcoind(uiUpdateCallback);
         }));
     },

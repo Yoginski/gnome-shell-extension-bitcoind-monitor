@@ -27,6 +27,7 @@ var BitcoindMonitorPrefsWidget = new GObject.Class({
         this._addSpinButton(3, 0, 'rpcport', 'Rpc port:', 1, 65535);
         this._addEntry(0, 1, 'rpcuser', 'Rpc user:', { visibility: false });
         this._addEntry(3, 1, 'rpcpassword', 'Rpc password:', { visibility: false });
+        this._addSpinButton(0, 2, 'refreshinterval', 'Interval (seconds):', 1, 600);
     },
 
     _addEntry: function(x, y, key, text, options = {}) {
