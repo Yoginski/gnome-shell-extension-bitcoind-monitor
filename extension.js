@@ -18,7 +18,7 @@ var BitcoinMonitorButton = new Lang.Class({
     Extends: PanelMenu.Button,
 
     _init: function() {
-        this.parent(0, 'bitcoind-monitor', false);
+        this.parent(St.Align.START, 'bitcoind-monitor');
 
         this._settings = Convenience.getSettings();
         this._rpcUser = this._settings.get_string('rpcuser');
