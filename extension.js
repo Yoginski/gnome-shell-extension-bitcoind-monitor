@@ -27,16 +27,37 @@ var BitcoinMonitorButton = new Lang.Class({
         this._rpcPort = this._settings.get_int('rpcport');
         this._refreshInterval = this._settings.get_int('refreshinterval');
 
+        this._addMainIndicator();
+        this._addPopupMenu();
+
+        this._updateGetBlockchainInfo();
+        Mainloop.timeout_add_seconds(this._refreshInterval, Lang.bind(this, function() {
+            this._updateGetBlockchainInfo();
+        }));
+    },
+
+    _addMainIndicator: function() {
         let box = new St.BoxLayout();
 
         let icon = new St.Icon({ style_class: 'bitcoin-white' });
-        let label = new St.Label({ text: '  unavailable ', y_expand: true, y_align: Clutter.ActorAlign.CENTER });
+        this._label = new St.Label({ text: '  unavailable ', y_expand: true, y_align: Clutter.ActorAlign.CENTER });
         box.add(icon);
-        box.add(label);
+        box.add(this._label);
 		box.add(PopupMenu.arrowIcon(St.Side.BOTTOM));
 
 		this.actor.add_child(box);
+    },
 
+    _addPopupMenu: function() {
+        this._addPopupMenuSeparator();
+        this._addPopupMenuPrefLink();
+    },
+
+    _addPopupMenuSeparator: function() {
+        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+    },
+
+    _addPopupMenuPrefLink: function() {
         let item = new PopupMenu.PopupBaseMenuItem();
         item.actor.add(new St.Label({ text: _("Bitcoind monitor Settings") }), { expand: true, x_fill: false });
 
@@ -45,22 +66,21 @@ var BitcoinMonitorButton = new Lang.Class({
         });
 
         this.menu.addMenuItem(item);
-
-        let uiUpdateCallback = function(json) {
-            let result = json.result;
-            let blocks = result.blocks;
-            label.text = "  " + blocks.toString() + "";
-        };
-
-        this._queryBitcoind(uiUpdateCallback);
-        Mainloop.timeout_add_seconds(this._refreshInterval, Lang.bind(this, function() {
-            this._queryBitcoind(uiUpdateCallback);
-        }));
     },
 
-    _queryBitcoind: function(callback) {
+    _updateGetBlockchainInfo: function() {
+        let self = this
+        let updateCallback = function(json) {
+            let result = json.result;
+            let blocks = result.blocks;
+            self._label.text = "  " + blocks.toString() + "";
+        };
+
+        this._rpcRequest('{ "method": "getblockchaininfo" }', updateCallback);
+    },
+
+    _rpcRequest: function(body, callback) {
         let message = Soup.Message.new('POST', 'http://' + this._rpcUser + ':' + this._rpcPassword + '@' + this._rpcHost + ':' + this._rpcPort.toString());
-        let body = '{ "method": "getblockchaininfo" }';
         message.set_request('application/json', 2, body);
         _httpSession.queue_message(message, function(session, message) {
             let root = JSON.parse(message.response_body.data);
