@@ -1,12 +1,10 @@
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const St = imports.gi.St;
-const Gio = imports.gi.Gio;
 const Main = imports.ui.main;
 const Lang = imports.lang;
 const Soup = imports.gi.Soup;
 const Util = imports.misc.util;
 const Clutter = imports.gi.Clutter;
-const Tweener = imports.ui.tweener;
 const Mainloop = imports.mainloop;
 const Convenience = Me.imports.convenience;
 
@@ -14,12 +12,6 @@ const PanelMenu = imports.ui.panelMenu;
 const PopupMenu = imports.ui.popupMenu;
 
 const _httpSession = new Soup.SessionAsync();
-
-function getSettings(schema) {
-    if (Gio.Settings.list_schemas().indexOf(schema) == -1)
-        throw _("Schema \"%s\" not found.").format(schema);
-    return new Gio.Settings({ schema: schema });
-}
 
 var BitcoinMonitorButton = new Lang.Class({
     Name: 'BitcoinMonitorButton',
