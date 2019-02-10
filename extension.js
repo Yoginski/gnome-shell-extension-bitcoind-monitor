@@ -20,6 +20,8 @@ var BitcoinMonitorButton = new Lang.Class({
     _init: function() {
         this.parent(St.Align.START, 'bitcoind-monitor');
 
+        this._blockHeight = 0;
+
         this._settings = Convenience.getSettings();
         this._rpcUser = this._settings.get_string('rpcuser');
         this._rpcPassword = this._settings.get_string('rpcpassword');
@@ -30,6 +32,7 @@ var BitcoinMonitorButton = new Lang.Class({
         this._addMainIndicator();
         this._addPopupMenu();
 
+        this._updateGetNetworkInfo();
         this._updateGetBlockchainInfo();
         Mainloop.timeout_add_seconds(this._refreshInterval, Lang.bind(this, function() {
             this._updateGetBlockchainInfo();
@@ -40,21 +43,39 @@ var BitcoinMonitorButton = new Lang.Class({
         let box = new St.BoxLayout();
 
         let icon = new St.Icon({ style_class: 'bitcoin-white' });
-        this._label = new St.Label({ text: '  unavailable ', y_expand: true, y_align: Clutter.ActorAlign.CENTER });
+        this._blockHeightLabel = new St.Label({ text: '  unavailable ', y_expand: true, y_align: Clutter.ActorAlign.CENTER });
         box.add(icon);
-        box.add(this._label);
+        box.add(this._blockHeightLabel);
 		box.add(PopupMenu.arrowIcon(St.Side.BOTTOM));
 
 		this.actor.add_child(box);
     },
 
     _addPopupMenu: function() {
+        this._versionLabel = this._addPopupMenuMetric('Version:', 'unavailable')
+        this._peerConnectionCountLabel = this._addPopupMenuMetric('Peer connection count:', 'unavailable');
+        this._lastBlockTimeLabel = this._addPopupMenuMetric('Last block time:', 'unavailable')
         this._addPopupMenuSeparator();
         this._addPopupMenuPrefLink();
     },
 
     _addPopupMenuSeparator: function() {
-        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+        let separator = new PopupMenu.PopupSeparatorMenuItem()
+        this.menu.addMenuItem(separator);
+        return separator
+    },
+
+    _addPopupMenuMetric: function(title, text) {
+        let item = new PopupMenu.PopupBaseMenuItem();
+
+        let titleLabel = new St.Label({ text: title });
+        item.actor.add(titleLabel, { x_fill: true, expand: true });
+        let valueLabel = new St.Label({ text: text });
+        item.actor.add(valueLabel);
+
+        this.menu.addMenuItem(item);
+
+        return valueLabel;
     },
 
     _addPopupMenuPrefLink: function() {
@@ -66,6 +87,7 @@ var BitcoinMonitorButton = new Lang.Class({
         });
 
         this.menu.addMenuItem(item);
+        return item
     },
 
     _updateGetBlockchainInfo: function() {
@@ -73,10 +95,27 @@ var BitcoinMonitorButton = new Lang.Class({
         let updateCallback = function(json) {
             let result = json.result;
             let blocks = result.blocks;
-            self._label.text = "  " + blocks.toString() + "";
+            if (self._blockHeight < blocks) {
+                self._blockHeight = blocks;
+                self._blockHeightLabel.text = "  " + blocks.toString() + "";
+
+                let date = new Date(result.mediantime*1000);
+                self._lastBlockTimeLabel.text = date.toLocaleString();
+            }
         };
 
         this._rpcRequest('{ "method": "getblockchaininfo" }', updateCallback);
+    },
+
+    _updateGetNetworkInfo: function() {
+        let self = this
+        let updateCallback = function(json) {
+            let result = json.result;
+            self._versionLabel.text = result.subversion;
+            self._peerConnectionCountLabel.text = result.connections.toString();
+        };
+
+        this._rpcRequest('{ "method": "getnetworkinfo" }', updateCallback);
     },
 
     _rpcRequest: function(body, callback) {
@@ -84,7 +123,13 @@ var BitcoinMonitorButton = new Lang.Class({
         message.set_request('application/json', 2, body);
         _httpSession.queue_message(message, function(session, message) {
             let root = JSON.parse(message.response_body.data);
-            callback.call(this, root);
+            try {
+                callback.call(this, root);
+            } catch (e) {
+                log('Failed to parse rpc response: ' + e.toString());
+                log('Rpc response status_code: ' + message.status_code.toString());
+                log('Rpc response body: ' + message.response_body.data);
+            }
         });
     }
 });
