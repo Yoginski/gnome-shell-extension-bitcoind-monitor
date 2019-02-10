@@ -4,6 +4,7 @@ const Gio = imports.gi.Gio;
 const Main = imports.ui.main;
 const Lang = imports.lang;
 const Soup = imports.gi.Soup;
+const Util = imports.misc.util;
 const Clutter = imports.gi.Clutter;
 const Tweener = imports.ui.tweener;
 const Mainloop = imports.mainloop;
@@ -25,7 +26,7 @@ var BitcoinMonitorButton = new Lang.Class({
     Extends: PanelMenu.Button,
 
     _init: function() {
-        this.parent(0, 'bitcoind-monitor', true);
+        this.parent(0, 'bitcoind-monitor', false);
 
         this._settings = Convenience.getSettings();
         this._rpcUser = this._settings.get_string('rpcuser');
@@ -44,10 +45,18 @@ var BitcoinMonitorButton = new Lang.Class({
 
 		this.actor.add_child(box);
 
+        let item = new PopupMenu.PopupBaseMenuItem();
+        item.actor.add(new St.Label({ text: _("Bitcoind monitor Settings") }), { expand: true, x_fill: false });
+
+        item.connect('activate', function () {
+            Util.spawn(["gnome-shell-extension-prefs", Me.metadata.uuid]);
+        });
+
+        this.menu.addMenuItem(item);
+
         let uiUpdateCallback = function(json) {
             let result = json.result;
             let blocks = result.blocks;
-            log(blocks);
             label.text = "  " + blocks.toString() + "";
         };
 
