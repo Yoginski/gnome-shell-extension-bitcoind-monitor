@@ -21,6 +21,7 @@ var BitcoinMonitorButton = new Lang.Class({
         this.parent(St.Align.START, 'bitcoind-monitor');
 
         this._blockHeight = 0;
+        this._targetBlockHeight = 0;
 
         this._settings = Convenience.getSettings();
         this._rpcUser = this._settings.get_string('rpcuser');
@@ -95,9 +96,15 @@ var BitcoinMonitorButton = new Lang.Class({
         let updateCallback = function(json) {
             let result = json.result;
             let blocks = result.blocks;
-            if (self._blockHeight < blocks) {
+            let headers = result.headers;
+            if (self._blockHeight < blocks || self._targetBlockHeight < headers) {
                 self._blockHeight = blocks;
-                self._blockHeightLabel.text = "  " + blocks.toString() + "";
+                self._targetBlockHeight = headers;
+
+                self._blockHeightLabel.text = " " +
+                    self._blockHeight.toString() +
+                    " / " +
+                    self._targetBlockHeight.toString();
 
                 let date = new Date(result.mediantime*1000);
                 self._lastBlockTimeLabel.text = date.toLocaleString();
