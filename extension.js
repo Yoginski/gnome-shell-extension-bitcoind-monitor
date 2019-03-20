@@ -36,6 +36,7 @@ var BitcoinMonitorButton = new Lang.Class({
         this._updateGetNetworkInfo();
         this._updateGetBlockchainInfo();
         Mainloop.timeout_add_seconds(this._refreshInterval, Lang.bind(this, function() {
+            this._updateGetNetworkInfo();
             this._updateGetBlockchainInfo();
         }));
     },
